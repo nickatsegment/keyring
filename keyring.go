@@ -18,7 +18,6 @@ const (
 	SecretServiceBackend BackendType = "secret-service"
 	KeychainBackend      BackendType = "keychain"
 	KWalletBackend       BackendType = "kwallet"
-	WinCredBackend       BackendType = "wincred"
 	FileBackend          BackendType = "file"
 	PassBackend          BackendType = "pass"
 )
@@ -26,8 +25,6 @@ const (
 // This order makes sure the OS-specific backends
 // are picked over the more generic backends.
 var backendOrder = []BackendType{
-	// Windows
-	WinCredBackend,
 	// MacOS
 	KeychainBackend,
 	// Linux
