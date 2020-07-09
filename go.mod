@@ -3,7 +3,6 @@ module github.com/99designs/keyring
 go 1.14
 
 require (
-	github.com/danieljoos/wincred v1.1.0 // indirect
 	github.com/dvsekhvalnov/jose2go v0.0.0-20180829124132-7f401d37b68a
 	github.com/godbus/dbus v0.0.0-20190726142602-4481cbc300e2
 	github.com/gsterjov/go-libsecret v0.0.0-20161001094733-a6f4afe4910c
