@@ -3,8 +3,10 @@
 package keyring
 
 import (
+	"log"
 	"os"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/gsterjov/go-libsecret"
@@ -135,6 +137,48 @@ func TestLibSecretRemoveWhenNotEmpty(t *testing.T) {
 
 	if _, err := kr.Get("llamas"); err != nil {
 		t.Fatal(err)
+	}
+
+	if err := kr.Remove("llamas"); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestRoundtripPublicOnly(t *testing.T) {
+	kr, err := Open(Config{
+		AllowedBackends: []BackendType{SecretServiceBackend},
+		ServiceName:     "keyring-test",
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	item := Item{Key: "llamas", Data: []byte("llamas are great")}
+
+	if err := kr.Set(item); err != nil {
+		t.Fatal(err)
+	}
+
+	// reopen
+	kr, err = Open(Config{
+		AllowedBackends: []BackendType{SecretServiceBackend},
+		ServiceName:     "keyring-test",
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if _, err := kr.Get("llamas"); err != nil {
+		t.Error(err)
+		skr := kr.(*secretsKeyring)
+		collections, _ := skr.service.Collections()
+		for _, collection := range collections {
+			if strings.Contains(string(collection.Path()), "_2d") {
+				log.Printf("collection with _2d: %s", string(collection.Path()))
+			} else {
+				log.Printf("collection: %s", string(collection.Path()))
+			}
+		}
 	}
 
 	if err := kr.Remove("llamas"); err != nil {
