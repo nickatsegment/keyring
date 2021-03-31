@@ -56,6 +56,10 @@ func (e *secretsError) Error() string {
 
 var errCollectionNotFound = errors.New("The collection does not exist. Please add a key first")
 
+func (k *secretsKeyring) genCollectionPath() string {
+	return libsecret.DBusPath + "/collection/" + k.name
+}
+
 func (k *secretsKeyring) openSecrets() error {
 	session, err := k.service.Open()
 	if err != nil {
@@ -69,7 +73,7 @@ func (k *secretsKeyring) openSecrets() error {
 		return err
 	}
 
-	path := libsecret.DBusPath + "/collection/" + k.name
+	path := k.genCollectionPath()
 
 	for _, collection := range collections {
 		if string(collection.Path()) == path {
@@ -166,6 +170,10 @@ func (k *secretsKeyring) Set(item Item) error {
 		collection, err := k.service.CreateCollection(k.name)
 		if err != nil {
 			return err
+		}
+
+		if string(collection.Path()) != k.genCollectionPath() {
+			return fmt.Errorf("tried to create collection at path %s, but got %s", k.genCollectionPath(), string(collection.Path()))
 		}
 
 		k.collection = collection
